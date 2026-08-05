@@ -105,6 +105,58 @@ print("BFS Traversal Order:", result)
 
 ```
 ---
+## Code Flow:
+
+Step 1: Set Up Initial Data StructuresVisited Set (visited = set()): Tracks nodes that have already been discovered. Hash sets give $\mathcal{O}(1)$ average time complexity for lookups.Queue (queue = deque([start_node])): Uses Python’s collections.deque (double-ended queue), allowing fast $\mathcal{O}(1)$ removals from the left side (popleft()). Standard lists take $\mathcal{O}(N)$ to pop from the front.
+
+Step 2: Mark Start Node as VisitedBefore entering the main processing loop, the algorithm adds the start_node to visited.State: queue = ['A'], visited = {'A'}
+
+Step 3: Begin Processing Loop (while queue:)The loop runs continuously until every reachable node is processed and the queue becomes empty.
+
+Iteration 1 (Level 0 - Start Node)
+Dequeue: current = queue.popleft() $\rightarrow$ Pops 'A'.
+Record: Add 'A' to output list ['A'].
+Discover Neighbors: Look up 'A' in graph $\rightarrow$ Neighbors are ['B', 'C'].
+Check & Enqueue:'B' is not in visited: Add to visited, push to queue.'C' is not in visited: Add to visited, push to queue.
+End of Iteration 1: queue = ['B', 'C'], visited = {'A', 'B', 'C'}
+
+Iteration 2 (Level 1 - First Neighbor)Dequeue: current = queue.popleft() $\rightarrow$ Pops 'B'.
+Record: Output becomes ['A', 'B'].
+Discover Neighbors: 'B' connects to ['A', 'D', 'E'].
+Check & Enqueue:'A' is already in visited $\rightarrow$ Skipped!'D' is not in visited: Add to visited, push to queue.'E' is not in visited: Add to visited, push to queue.
+End of Iteration 2: queue = ['C', 'D', 'E'], visited = {'A', 'B', 'C', 'D', 'E'}
+
+Iteration 3 (Level 1 - Second Neighbor)
+Dequeue: current = queue.popleft() $\rightarrow$ Pops 'C'.
+Record: Output becomes ['A', 'B', 'C'].
+Discover Neighbors: 'C' connects to ['A', 'F'].
+Check & Enqueue:'A' is already in visited $\rightarrow$ Skipped!'F' is not in visited: Add to visited, push to queue.
+End of Iteration 3: queue = ['D', 'E', 'F'], visited = {'A', 'B', 'C', 'D', 'E', 'F'}
+
+Remaining Iterations (Level 2 - Leaf Nodes)'D', 'E', and 'F' are dequeued one by one.Their neighbors are either already visited or don't exist.Once 'F' is popped, queue becomes [] (empty).The while queue: loop terminates, returning ['A', 'B', 'C', 'D', 'E', 'F'].
 
 
+---
 
+### Critical Failsafes in BFS
+Without proper guardrails, graph algorithms can easily fail, freeze, or overflow memory. Here are the necessary failsafes:
+
+Failsafe 1: Early-Visited Marking (Infinite Loop Guard):
+
+The Trap: Marking a node as visited after dequeuing it instead of when enqueueing it.
+Why it fails: If two adjacent nodes point to the same child, that child will be appended to the queue multiple times before it ever gets popped and marked as visited.
+Fix: Mark nodes in visited immediately upon discovering them before pushing to queue.
+
+Failsafe 2: Missing Node / Key Guard:
+
+If a node has no outgoing edges or isn't explicit in the adjacency dictionary, looking up graph[current] will raise a KeyError.
+
+Failsafe 3: Disconnected Graphs Handling
+Standard BFS starting from node 'A' will miss any isolated subgraphs (e.g., nodes 'X' and 'Y' completely disconnected from 'A').
+
+Failsafe Wrapper: To traverse an entire graph with multiple disconnected components, loop over all keys in the graph:
+
+Failsafe 4: Maximum Depth / Search Distance Limit
+In massive or infinite graphs (e.g., web crawling), standard BFS can exhaust RAM.
+
+Failsafe Solution: Track distance levels and stop when reaching a depth limit:
