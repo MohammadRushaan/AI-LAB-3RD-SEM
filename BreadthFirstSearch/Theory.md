@@ -107,30 +107,30 @@ print("BFS Traversal Order:", result)
 ---
 ## Code Flow:
 
-Step 1: Set Up Initial Data StructuresVisited Set (visited = set()): Tracks nodes that have already been discovered. Hash sets give $\mathcal{O}(1)$ average time complexity for lookups.Queue (queue = deque([start_node])): Uses Python’s collections.deque (double-ended queue), allowing fast $\mathcal{O}(1)$ removals from the left side (popleft()). Standard lists take $\mathcal{O}(N)$ to pop from the front.
+Step 1: Set Up Initial Data StructuresVisited Set (visited = set()): Tracks nodes that have already been discovered. Hash sets give O(1) average time complexity for lookups.Queue (queue = deque([start_node])): Uses Python’s collections.deque (double-ended queue), allowing fast O(1) removals from the left side (popleft()). Standard lists take O(N) to pop from the front.
 
 Step 2: Mark Start Node as VisitedBefore entering the main processing loop, the algorithm adds the start_node to visited.State: queue = ['A'], visited = {'A'}
 
 Step 3: Begin Processing Loop (while queue:)The loop runs continuously until every reachable node is processed and the queue becomes empty.
 
 Iteration 1 (Level 0 - Start Node)
-Dequeue: current = queue.popleft() $\rightarrow$ Pops 'A'.
+Dequeue: current = queue.popleft() ---> Pops 'A'.
 Record: Add 'A' to output list ['A'].
-Discover Neighbors: Look up 'A' in graph $\rightarrow$ Neighbors are ['B', 'C'].
+Discover Neighbors: Look up 'A' in graph ---> Neighbors are ['B', 'C'].
 Check & Enqueue:'B' is not in visited: Add to visited, push to queue.'C' is not in visited: Add to visited, push to queue.
 End of Iteration 1: queue = ['B', 'C'], visited = {'A', 'B', 'C'}
 
-Iteration 2 (Level 1 - First Neighbor)Dequeue: current = queue.popleft() $\rightarrow$ Pops 'B'.
+Iteration 2 (Level 1 - First Neighbor)Dequeue: current = queue.popleft() ---> Pops 'B'.
 Record: Output becomes ['A', 'B'].
 Discover Neighbors: 'B' connects to ['A', 'D', 'E'].
-Check & Enqueue:'A' is already in visited $\rightarrow$ Skipped!'D' is not in visited: Add to visited, push to queue.'E' is not in visited: Add to visited, push to queue.
+Check & Enqueue:'A' is already in visited ---> Skipped!'D' is not in visited: Add to visited, push to queue.'E' is not in visited: Add to visited, push to queue.
 End of Iteration 2: queue = ['C', 'D', 'E'], visited = {'A', 'B', 'C', 'D', 'E'}
 
 Iteration 3 (Level 1 - Second Neighbor)
-Dequeue: current = queue.popleft() $\rightarrow$ Pops 'C'.
+Dequeue: current = queue.popleft() ---> Pops 'C'.
 Record: Output becomes ['A', 'B', 'C'].
 Discover Neighbors: 'C' connects to ['A', 'F'].
-Check & Enqueue:'A' is already in visited $\rightarrow$ Skipped!'F' is not in visited: Add to visited, push to queue.
+Check & Enqueue:'A' is already in visited ---> Skipped!'F' is not in visited: Add to visited, push to queue.
 End of Iteration 3: queue = ['D', 'E', 'F'], visited = {'A', 'B', 'C', 'D', 'E', 'F'}
 
 Remaining Iterations (Level 2 - Leaf Nodes)'D', 'E', and 'F' are dequeued one by one.Their neighbors are either already visited or don't exist.Once 'F' is popped, queue becomes [] (empty).The while queue: loop terminates, returning ['A', 'B', 'C', 'D', 'E', 'F'].
