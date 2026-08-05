@@ -202,3 +202,38 @@ Leaf Nodes (Dead Ends): D, E
 * Visited Set acts as a guardrail, skipping nodes already on or previously popped from the stack to prevent infinite loops.
 
 ---
+
+### Critical Failsafes in DFS:
+
+When running Depth-First Search (DFS) in production or on large, unpredictable graphs, several critical failure modes can crash your application: Infinite Loops (from cycle detection failures), Stack Overflow Errors (from recursion depth limits), Out-Of-Memory (OOM) Errors, and Performance Degradation (from deep paths).Here are the essential failsafes you must build into a robust DFS implementation.
+
+1. Visited Set Tracking (Loop Protection):
+The most common point of failure in DFS is getting stuck in an infinite loop due to cycles.Implementation:Always track visited nodes using a fast lookup data structure like a Hash Set (O(1) lookup time) instead of a list (O(N) lookup time).
+
+If you are dealing with directed graphs where paths matter (e.g., finding all paths), use a Recursion Stack Set alongside your visited set to distinguish between visiting a node again in a different path versus hitting an active cycle
+
+2. Iterative DFS over Recursion (Stack Overflow Failsafe)
+Python and most languages have a strict limit on the call stack size (typically 1,000 frames in Python). Deeply nested graphs or linear linked-list structures will trigger a RecursionError: maximum recursion depth exceeded.
+
+Option A: Convert to Iterative DFS
+The cleanest failsafe is using an explicit heap-allocated stack (list in Python), which is bounded by available RAM rather than the strict execution call stack.
+Option B: Increase System Recursion Limit (Use with Caution)
+If you must use recursion, temporarily raise the depth limit
+
+3. Depth Limiting (IDDFS / Depth Caps)
+DFS goes aggressively deep down one path. If a path is infinite or unnecessarily deep, it can waste memory and CPU before ever checking other short paths.
+
+Implementation: Depth Cap
+Pass a depth counter and abort traversal along a branch if it exceeds a threshold
+
+Look into Iterative Deepening DFS (IDDFS). It combines the space efficiency of DFS with the level-by-level safety of BFS by running depth-limited DFS with gradually increasing depth caps (1, 2, 3,....)
+
+4. Timeout Guards (Time-Complexity Failsafe)
+If graph sizes are variable or coming from user input, a single query can block your main thread or server indefinitely.
+
+Implementation: Elapsed Time Check
+
+5. Input Validation & Edge Case Guards
+Before starting the algorithm, defend against bad inputs
+
+---
