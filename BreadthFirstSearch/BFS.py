@@ -25,10 +25,10 @@ def input_graph():
 
 
 def bfs_traversal(graph, start_node):
-    """Performs BFS using an explicit Queue data structure showing intermediate steps."""
-    print("\n==========================================")
+    #Performs BFS using an explicit Queue data structure showing intermediate steps.
+    
     print(f" BREADTH-FIRST SEARCH (BFS) FROM '{start_node}' ")
-    print("==========================================")
+    
     
     visited = []
     queue = deque([start_node])
