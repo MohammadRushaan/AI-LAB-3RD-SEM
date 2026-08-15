@@ -2,6 +2,12 @@
 
 Uniform Cost Search (UCS) is an optimal, uninformed graph search algorithm that finds the path with the lowest cumulative cost between a start node and a destination. It explores paths in strict order of their total accumulated cost rather than the number of hops.
 
+## Key Concepts
+* Priority Queue: UCS uses a priority queue to stores nodes and always selects the node with the lowest total cost for exploration.
+* Path Cost: Calculates the cumulative cost from the start node to the current node and prioritizes nodes with lower costs.
+* Node Expansion: Explores nodes inRepresents the total cost required to reach a node from the start node. order of increasing path cost, giving preference to cheaper paths first.
+* Optimal Solution: Stops when the goal node is reached through the lowest-cost path, ensuring the best solution when all edge costs are non-negative.
+
 ## Real-World Analogy: Toll-Road Navigation
 Imagine driving across the country with a GPS set to find the cheapest route in total toll fees, ignoring distance or time:
 
@@ -146,3 +152,46 @@ visited[current_node] = cost
 4. Tie-Breaking InconsistenciesThe Risk: If two paths share identical cumulative costs, standard tuple comparisons (cost, node, path) may crash if node objects are unhashable or non-comparable.Failsafe: Include an incrementing unique integer or timestamp counter in the tuple: (cost, count, node, path).
 
 ---
+## Challenges:
+
+* High Time Complexity: May explore a large number of nodes before reaching the goal, especially in large search spaces.
+* High Space Complexity: Requires storing all generated frontier nodes in the priority queue, leading to significant memory consumption.
+* Repeated Node Expansions: Nodes may be revisited and updated when a lower-cost path is discovered.
+* Performance Limitations: Can become computationally expensive for large graphs with many possible paths.
+
+---
+# Graph Search Algorithms: Comprehensive Comparison
+
+A comparative breakdown of **Uniform Cost Search (UCS)** against **Dijkstra’s Algorithm**, **Breadth-First Search (BFS)**, **Depth-First Search (DFS)**, and **A\* Search**.
+
+---
+
+### Algorithm Comparison Matrix
+
+| Algorithm | Frontier Priority Metric | Edge Weights | Uses Heuristic $h(n)$? | Complete? | Optimal? | Time Complexity | Space Complexity |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **UCS** | Cumulative path cost $g(n)$ | Non-negative ($w \ge \epsilon > 0$) | No (Uninformed) | Yes | Yes | $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ | $O(b^{1 + \lfloor C^*/\epsilon \rfloor})$ |
+| **Dijkstra** | Distance from source $d(v)$ | Non-negative ($w \ge 0$) | No (Uninformed) | Yes | Yes | $O((V + E) \log V)$ | $O(V)$ |
+| **BFS** | Node depth / hop count | Unweighted (or uniform weight) | No (Uninformed) | Yes | Yes (if uniform cost) | $O(b^d)$ | $O(b^d)$ |
+| **DFS** | Deepest node first (LIFO stack) | Any | No (Uninformed) | No (infinite graph) | No | $O(b^m)$ | $O(bm)$ |
+| **A\*** | Evaluation function $f(n) = g(n) + h(n)$ | Non-negative ($w \ge \epsilon > 0$) | Yes (Informed) | Yes | Yes (if $h(n)$ is admissible) | $O(b^d)$ (heuristic-dependent) | $O(b^d)$ |
+
+---
+
+### Detailed Comparisons of UCS with other algortihms
+
+**UCS vs. Dijkstra’s Algorithm**
+* **Goal Orientation**: UCS is designed for single-source, single-target search in potentially infinite or dynamically generated state spaces; it terminates the moment the goal node is dequeued. Traditional Dijkstra computes the shortest path from a single source to all nodes in an explicit graph.
+* **Equivalence**: A Dijkstra implementation with an early-exit condition upon reaching a target goal is functionally identical to Uniform Cost Search.
+
+**UCS vs. Breadth-First Search (BFS)**
+* **Cost Sensitivity**: BFS explores nodes layer-by-layer based on edge hops (equivalent to setting all edge weights $w = 1$).
+* **Optimality**: UCS guarantees the least-cost path across graphs with variable non-negative edge weights, whereas BFS is only cost-optimal when all step costs are identical.
+
+**UCS vs. Depth-First Search (DFS)**
+* **Exploration Strategy**: DFS plunges down a single branch to its maximum depth using a LIFO stack before backtracking, disregarding edge costs entirely.
+* **Trade-Offs**: DFS has a significantly lower memory footprint ($O(bm)$, where $m$ is maximum depth) compared to the exponential memory requirements of UCS, but DFS provides no optimality guarantee and can get trapped in infinite paths.
+
+**UCS vs. A\* Search**
+* **Heuristic Guidance**: UCS only evaluates backward cost $g(n)$ (cost from start to current node). A\* evaluates total estimated cost $f(n) = g(n) + h(n)$, adding a forward heuristic $h(n)$ to estimate the remaining distance to the goal.
+* **Search Direction**: UCS expands uniformly in all directions (concentric cost contours), while A\* uses the heuristic to focus the search beam directly toward the target, expanding significantly fewer total nodes.
