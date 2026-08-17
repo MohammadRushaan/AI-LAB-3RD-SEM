@@ -45,7 +45,7 @@ def main():
         u, v, w = input().strip().split()
         weight = float(w)
         graph.setdefault(u, []).append((v, weight))
-        graph.setdefault(v, [])  # Ensure destination node is initialized
+        graph.setdefault(v, []).append((u, weight))  # Ensure destination node is initialized
 
     # 2. User input source node and goal node
     source = input("\nEnter Source Node: ").strip()
