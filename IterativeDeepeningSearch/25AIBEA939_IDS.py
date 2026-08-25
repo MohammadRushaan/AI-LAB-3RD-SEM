@@ -64,7 +64,7 @@ def main():
     source = input("\nEnter source node: ").strip()
     goal = input("Enter goal node: ").strip()
     max_threshold = int(
-        input("Enter maximum search depth threshold (e.g., 5): ")
+        input("Enter maximum search depth threshold : ")
     )
 
     iterative_deepening_search(graph, source, goal, max_threshold)
