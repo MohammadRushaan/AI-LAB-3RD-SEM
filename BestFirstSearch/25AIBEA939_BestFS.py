@@ -1,4 +1,4 @@
-def get_user_inputs():
+def user_inputs():
     print("")
 
     num_edges = int(input("Enter total number of directed edges: ").strip())
@@ -68,7 +68,7 @@ def best_first_search(graph, heuristics, start, goal):
 
 
 def main():
-    graph, heuristics, start, goal = get_user_inputs()
+    graph, heuristics, start, goal = user_inputs()
     final_path = best_first_search(graph, heuristics, start, goal)
 
     print("")
