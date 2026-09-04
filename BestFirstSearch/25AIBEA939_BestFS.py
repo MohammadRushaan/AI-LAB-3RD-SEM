@@ -34,7 +34,7 @@ def best_first_search(graph, heuristics, start, goal):
 
     while open_list:
         # Sort open list ascending by heuristic value h(n)
-        open_list.sort(key=lambda item: item[0])
+        open_list.sort(key = lambda item: item[0])
 
         # Pop the node with the lowest heuristic value (index 0)
         hval, current_path = open_list.pop(0)

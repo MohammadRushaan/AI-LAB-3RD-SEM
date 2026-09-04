@@ -13,9 +13,7 @@ def beam_search(graph, heuristics, start, goal, beam_width):
 
         # Check if any path in the current beam reached the goal
         for hval, current, path in beam:
-            print(
-                f"Expanding: '{current}' (h={hval}) | Path: {' -> '.join(path)}"
-            )
+            print(f"Expanding: '{current}' (h={hval}) | Path: {' -> '.join(path)}")
             if current == goal:
                 print(f"\nGoal node '{goal}' reached successfully")
                 return path
@@ -67,7 +65,7 @@ def main():
     for i in range(num_edges):
         u, v = input().split()
         graph[u].append(v)
-        graph[v].append(u)
+        #graph[v].append(u)
 
     start = input("\nEnter source node: ").strip()
     goal = input("Enter goal node: ").strip()
