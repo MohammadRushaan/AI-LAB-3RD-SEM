@@ -12,7 +12,6 @@ def print_board(board):
         print("  " + " ".join(row))
     print()
 
-
 def solve_n_queens(n):
     board = []
     for i in range(n):
@@ -44,7 +43,7 @@ def solve_n_queens(n):
             diag2.add(r + c)
             step[0] += 1
             print(f"[Step {step[0]}] Place Queen at ({r}, {c}):")
-            print_board(board)
+            #print_board(board)
 
             # Recurse to next row
             backtrack(r + 1)
@@ -56,11 +55,10 @@ def solve_n_queens(n):
             diag2.remove(r + c)
             step[0] += 1
             print(f"[Step {step[0]}] Backtrack from ({r}, {c}):")
-            print_board(board)
+            #print_board(board)
 
     backtrack(0)
     return solutions
-
 
 def main():
     n = get_user_input()
