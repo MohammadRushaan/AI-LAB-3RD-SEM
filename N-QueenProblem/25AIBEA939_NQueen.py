@@ -76,5 +76,8 @@ def main():
     if len(solutions) == 0:
         print(f"Note: No feasible solution exists for n = {n}.")
     print("")
-
+    for i in solutions:
+        for j in i:
+            print(j)
+        print()
 main()
