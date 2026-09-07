@@ -16,7 +16,7 @@ def print_board(board):
 def solve_n_queens(n):
     board = []
     for i in range(n):
-        row = ["."] * n
+        row = ["_"] * n
         board.append(row)
     solutions = []
 
@@ -50,7 +50,7 @@ def solve_n_queens(n):
             backtrack(r + 1)
 
             # Backtrack (revert state)
-            board[r][c] = "."
+            board[r][c] = "_"
             cols.remove(c)
             diag1.remove(r - c)
             diag2.remove(r + c)
