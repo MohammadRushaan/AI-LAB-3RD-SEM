@@ -16,6 +16,33 @@ No Backtracking / Memoryless: The algorithm never looks back or stores past path
 
 The Local Optima Dilemma: Because the search stops as soon as immediate neighbors are lower, the climber often settles on a smaller local peak rather than finding the highest peak (global maximum) on the entire landscape.
 
+## Code:
+``` python
+for _ in range(max_iter):
+    # Step 1: Probe neighbors
+    left = current_x - step_size
+    right = current_x + step_size
+    
+    # Step 2: Choose highest candidate
+    best_neighbor = right if f(right) > f(left) else left
+    
+    # Step 3: Step forward or stop
+    if f(best_neighbor) > f(current_x):
+        current_x = best_neighbor
+        path_x.append(current_x)
+        path_y.append(f(current_x))
+    else:
+        break
+```
+
+At each iteration, look immediately to the left and right by step_size
+Evaluating and Selecting the Best Neighbor (Greedy Step)
+Evaluate both candidate positions using the objective function f() to find which one is higher
+Transition or Termination Check
+Compare the elevation of best_neighbor against the climber's current elevation
+If higher (True): Update current_x to best_neighbor and append the new coordinates to path_x and path_y. The loop repeats from the new position.   
+If not higher (False): Neither neighbor yields a value higher than the current state. The climber has reached a local peak, so break exits the loop immediately. 
+
 ## Algorithmic Mechanics:
 1. State Evaluation: The objective function $f(x)$ serves as the height meter.
 2. Neighbor Generation: Using a fixed step size $\Delta x$, the search defines two candidate neighbors:   
