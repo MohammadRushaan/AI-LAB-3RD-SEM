@@ -47,8 +47,6 @@ curve_y = []
 steps = 1000
 dx = (xmax - xmin) / steps
 
-curve_x = []
-curve_y = []
 for i in range(steps + 1):
     val = xmin + i * dx
     curve_x.append(val)
@@ -61,7 +59,7 @@ plt.plot(path_x, path_y, "o--", color="orange", label="Climbing Steps")
 plt.scatter(path_x[0], path_y[0], color="green", s=90, label=f"Start ({path_x[0]:.2f})")
 plt.scatter(current_x, EqnVal(current_x), color="red", marker="*", s=120, label=f"Peak ({current_x:.2f})")
 
-plt.title("Hill Climbing with Custom Domain and Step Size")
+plt.title("Hill Climbing with Domain and Step Size")
 plt.xlabel("x")
 plt.ylabel("EqnVal(x)")
 plt.legend()
