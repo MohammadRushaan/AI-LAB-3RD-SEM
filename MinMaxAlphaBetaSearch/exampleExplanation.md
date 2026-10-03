@@ -218,3 +218,84 @@ Total nodes skipped (pruned) : 6
 Search reduction percentage  : 19.35%
 
 ```
+
+```mermaid
+flowchart TB
+    %% Styling Classes
+    classDef maxNode fill:#1e1b4b,stroke:#818cf8,stroke-width:2px,color:#f8fafc;
+    classDef minNode fill:#022c22,stroke:#34d399,stroke-width:2px,color:#f8fafc;
+    classDef leafNode fill:#1e293b,stroke:#64748b,stroke-width:1.5px,color:#f8fafc;
+    classDef cutoffNode fill:#450a0a,stroke:#ef4444,stroke-width:2px,stroke-dasharray: 4 4,color:#fca5a5;
+
+    %% Level 0: Root (MAX)
+    ROOT["ROOT (MAX)<br>α = 11 | β = +∞<br><b>Optimal Choice = 11</b>"]:::maxNode
+
+    %% Level 1: MIN
+    D1_0["Node_D1_0 (MIN)<br>α = -∞ | β = 3<br><b>Returns: 3</b>"]:::minNode
+    D1_1["Node_D1_1 (MIN)<br>α = 3 | β = 11<br><b>Returns: 11</b>"]:::minNode
+
+    ROOT ==>|"↓ [-∞, +∞]<br>↑ ret 3"| D1_0
+    ROOT ==>|"↓ [3, +∞]<br>↑ ret 11"| D1_1
+
+    %% Level 2: MAX
+    D2_0["Node_D2_0 (MAX)<br>α = 3 | β = +∞<br><b>Returns: 3</b>"]:::maxNode
+    D2_1["Node_D2_1 (MAX)<br>α = 5 | β = 3<br><b>Returns: 5</b>"]:::maxNode
+    D2_2["Node_D2_2 (MAX)<br>α = 11 | β = +∞<br><b>Returns: 11</b>"]:::maxNode
+    D2_3["Node_D2_3 (MAX)<br>α = 13 | β = 11<br><b>Returns: 13</b>"]:::maxNode
+
+    D1_0 -->|"↓ [-∞, +∞]<br>↑ ret 3"| D2_0
+    D1_0 -->|"↓ [-∞, 3]<br>↑ ret 5"| D2_1
+    D1_1 -->|"↓ [3, +∞]<br>↑ ret 11"| D2_2
+    D1_1 -->|"↓ [3, 11]<br>↑ ret 13"| D2_3
+
+    %% Level 3: MIN
+    D3_0["D3_0 (MIN)<br>β = 1"]:::minNode
+    D3_1["D3_1 (MIN)<br>β = 3"]:::minNode
+    D3_2["D3_2 (MIN)<br>β = 5"]:::minNode
+    D3_3["D3_3 (MIN)<br><b>✂ PRUNED</b>"]:::cutoffNode
+
+    D3_4["D3_4 (MIN)<br>β = 9"]:::minNode
+    D3_5["D3_5 (MIN)<br>β = 11"]:::minNode
+    D3_6["D3_6 (MIN)<br>β = 13"]:::minNode
+    D3_7["D3_7 (MIN)<br><b>✂ PRUNED</b>"]:::cutoffNode
+
+    D2_0 --> D3_0
+    D2_0 --> D3_1
+    D2_1 --> D3_2
+    D2_1 -.->|"✂ CUTOFF #1<br>β(3) ≤ α(5)"| D3_3
+
+    D2_2 --> D3_4
+    D2_2 --> D3_5
+    D2_2 --> D3_6
+    D2_3 -.->|"✂ CUTOFF #2<br>β(11) ≤ α(13)"| D3_7
+
+    %% Level 4: Terminal Leaves
+    L1(("1")):::leafNode
+    L2(("2")):::leafNode
+    L3(("3")):::leafNode
+    L4(("4")):::leafNode
+    L5(("5")):::leafNode
+    L6(("6")):::leafNode
+    L7(("7 (Pruned)")):::cutoffNode
+    L8(("8 (Pruned)")):::cutoffNode
+
+    L9(("9")):::leafNode
+    L10(("10")):::leafNode
+    L11(("11")):::leafNode
+    L12(("12")):::leafNode
+    L13(("13")):::leafNode
+    L14(("14")):::leafNode
+    L15(("15 (Pruned)")):::cutoffNode
+    L16(("16 (Pruned)")):::cutoffNode
+
+    D3_0 --- L1 & L2
+    D3_1 --- L3 & L4
+    D3_2 --- L5 & L6
+    D3_3 -.- L7 & L8
+
+    D3_4 --- L9 & L10
+    D3_5 --- L11 & L12
+    D3_6 --- L13 & L14
+    D3_7 -.- L15 & L16
+
+```
