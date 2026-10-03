@@ -1,21 +1,20 @@
-# Lists and counters to track results
+# Counters and list to record visited states and pruned structures
 minimax_visited = 0
 alphabeta_visited = 0
 pruned_list = []
-
 
 def input_and_build_tree():
     
     TreeDepth = int(input("Enter tree depth (must be > 3): "))
     while TreeDepth <= 3:
-        print("must be greater than 3!")
+        print("Tree Depth must be greater than 3!")
         TreeDepth = int(input("Enter tree depth : "))
 
-    branching = int(input("Enter branching factor : "))
+    branching = int(input("Enter branching factor: "))
 
     total_leaves = branching ** TreeDepth
     print("Enter", total_leaves, "leaf values separated by spaces:")
-    
+
     text_values = input().split()
     while len(text_values) != total_leaves:
         print("You must enter exactly", total_leaves, "numbers. Try again:")
@@ -25,26 +24,25 @@ def input_and_build_tree():
     for item in text_values:
         leaf_values.append(int(item))
 
-    
-    def build(current_depth, is_max):
-        # Base case: reached bottom depth, return the next leaf number
+    # Build Tree
+    def build(current_depth, node_index, is_max):
+        # Base case: reached leaf depth, return integer value
         if current_depth == TreeDepth:
             return leaf_values.pop(0)
 
+        node_name = "Node_D" + str(current_depth) + "_" + str(node_index)
+
         children = []
         for i in range(branching):
-            # Alternate turn: if current is MAX, child is MIN (not is_max)
-            child = build(current_depth + 1, not is_max)
+            child = build(current_depth + 1, node_index * branching + i, not is_max)
             children.append(child)
-        #dictionary 
+
         return {
+            "name": node_name,
             "is_max": is_max,
             "children": children
         }
-
-    # Start tree at depth 0 with MAX as Root
-    return build(0, True)
-
+    return build(0, 0, True)
 
 def minmax(node):
     global minimax_visited
@@ -54,7 +52,6 @@ def minmax(node):
     if type(node) is int:
         return node
 
-    # MAX Player's turn
     if node["is_max"] is True:
         best = -9999
         for child in node["children"]:
@@ -62,16 +59,13 @@ def minmax(node):
             if val > best:
                 best = val
         return best
-
-    # MIN Player's turn
-    else:
+    else:  # MIN node
         best = 9999
         for child in node["children"]:
             val = minmax(child)
             if val < best:
                 best = val
         return best
-
 
 def alphabeta(node, alpha, beta):
     global alphabeta_visited
@@ -81,9 +75,9 @@ def alphabeta(node, alpha, beta):
     if type(node) is int:
         return node
 
+    parent_name = node["name"]
     children = node["children"]
 
-    # MAX Player's turn
     if node["is_max"] is True:
         best = -9999
         for i in range(len(children)):
@@ -95,15 +89,19 @@ def alphabeta(node, alpha, beta):
             if best > alpha:
                 alpha = best
 
-            # Beta cutoff: Stop evaluating remaining children
+            # Beta cutoff (at MAX node)
             if beta <= alpha:
+                
                 for unvisited in children[i + 1:]:
-                    pruned_list.append("Beta cutoff at MAX")
+                    pruned_list.append({
+                        "node": unvisited,
+                        "parent": parent_name,
+                        "reason": "Beta Cutoff (at MAX)"
+                    })
                 break
         return best
 
-    # MIN Player's turn
-    else:
+    else:  # MIN node
         best = 9999
         for i in range(len(children)):
             child = children[i]
@@ -114,58 +112,79 @@ def alphabeta(node, alpha, beta):
             if best < beta:
                 beta = best
 
-            # Alpha cutoff: Stop evaluating remaining children
+            # Alpha cutoff (at MIN node)
             if beta <= alpha:
+                
                 for unvisited in children[i + 1:]:
-                    pruned_list.append("Alpha cutoff at MIN")
+                    pruned_list.append({
+                        "node": unvisited,
+                        "parent": parent_name,
+                        "reason": "Alpha Cutoff (at MIN)"
+                    })
                 break
         return best
 
-
 def display(tree, mm_result, ab_result):
-    def show_tree(node, depth):
+    
+    def printTree(node, depth):
         space = "    " * depth
         if type(node) is dict:
             role = "MIN"
             if node["is_max"] is True:
                 role = "MAX"
-            print(space + "|-- " + role)
+            print(space + "|-- [" + node["name"] + "] (" + role + ")")
             for child in node["children"]:
-                show_tree(child, depth + 1)
+                printTree(child, depth + 1)
         else:
-            print(space + "\\-- Leaf = " + str(node))
+            print(space + "\\-- Terminal Leaf = " + str(node))
 
     print()
-    print("SEARCH TREE STRUCTURE")
+    print("1. SEARCH TREE STRUCTURE ")
     print()
-    show_tree(tree, 0)
+    printTree(tree, 0)
 
+    
     print()
-    print("RESULTS")
+    print("2. FINAL VALUES")
     print()
-    print("Minimax Root Value    :", mm_result)
-    print("Alpha-Beta Root Value :", ab_result)
+    print("Standard Minimax Root Result :", mm_result)
+    print("Alpha-Beta Root Result       :", ab_result)
 
+    
     print()
-    print("PRUNING DETAILS")
+    print("3. PRUNED SUBTREES & TERMINAL NODES ")
     print()
     if len(pruned_list) > 0:
-        for cut in pruned_list:
-            print(" * Skipped branch due to:", cut)
+        cut_number = 1
+        for item in pruned_list:
+            pruned_item = item["node"]
+            parent_name = item["parent"]
+            reason = item["reason"]
+
+            if type(pruned_item) is int:
+                print(f"\n[Cut #{cut_number}] Terminal Leaf Pruned under [{parent_name}]")
+                print("  Reason  :", reason)
+                print("  Leaf    : Terminal Leaf Utility =", pruned_item)
+            else:
+                print(f"\n[Cut #{cut_number}] Entire Subtree Pruned under [{parent_name}]")
+                print("  Reason  :", reason)
+                print("  Subtree Structure & Skipped Leaves:")
+                printTree(pruned_item, depth=1)
+
+            cut_number = cut_number + 1
     else:
-        print(" No branches were pruned.")
+        print(" No nodes or subtrees were pruned.")
 
     print()
-    print("COMPARISON")
+    print("4. COMPARISON: MINIMAX vs ALPHA-BETA")
     print()
-    saved = minimax_visited - alphabeta_visited
-    percent = (saved / minimax_visited) * 100
+    nodes_saved = minimax_visited - alphabeta_visited
+    percent = (nodes_saved / minimax_visited) * 100
 
-    print("Minimax nodes checked    :", minimax_visited)
-    print("Alpha-Beta nodes checked :", alphabeta_visited)
-    print("Nodes saved (pruned)     :", saved)
-    print("Efficiency improvement   :", round(percent, 2), "%")
-
+    print("Nodes explored by Minimax    :", minimax_visited)
+    print("Nodes explored by Alpha-Beta :", alphabeta_visited)
+    print("Total nodes skipped (pruned) :", nodes_saved)
+    print("Search reduction percentage  : " + str(round(percent, 2)) + "%")
 
 def main():
     tree = input_and_build_tree()
