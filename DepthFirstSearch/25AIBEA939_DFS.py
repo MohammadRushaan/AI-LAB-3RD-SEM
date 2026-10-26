@@ -60,7 +60,7 @@ def dfs_traversal(graph, start_node):
             
     return visited
 
-# Iterative approach requires stack but recursive approach doesn't
+# Iterative approach requires stack but recursive approach doesn't explicitly
 
 
 def main():
