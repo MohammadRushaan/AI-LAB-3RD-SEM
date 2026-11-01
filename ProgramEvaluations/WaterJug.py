@@ -1,5 +1,5 @@
-CAP_A = 7
-CAP_B = 4
+cap_a = 7
+cap_b = 4
 GOAL = 5
 
 def get_next_states(state):
@@ -7,12 +7,12 @@ def get_next_states(state):
     moves = []
 
     # Fill Jug A
-    if a < CAP_A:
-        moves.append((CAP_A, b))
+    if a < cap_a:
+        moves.append((cap_a, b))
 
     # Fill Jug B
-    if b < CAP_B:
-        moves.append((a, CAP_B))
+    if b < cap_b:
+        moves.append((a, cap_b))
 
     # Empty Jug A
     if a > 0:
@@ -23,13 +23,13 @@ def get_next_states(state):
         moves.append((a, 0))
 
     # Pour Jug A to Jug B
-    if a > 0 and b < CAP_B:
-        pour = min(a, CAP_B - b)
+    if a > 0 and b < cap_b:
+        pour = min(a, cap_b - b)
         moves.append((a - pour, b + pour))
 
     # Pour Jug B to Jug A
-    if b > 0 and a < CAP_A:
-        pour = min(b, CAP_A - a)
+    if b > 0 and a < cap_a:
+        pour = min(b, cap_a - a)
         moves.append((a + pour, b - pour))
 
     return moves
@@ -45,10 +45,10 @@ def solve_bfs():
         if current[0] == GOAL or current[1] == GOAL:
             return path
 
-        for nxt in get_next_states(current):
-            if nxt not in visited:
-                visited.append(nxt)
-                queue.append((nxt, path + [nxt]))
+        for next in get_next_states(current):
+            if next not in visited:
+                visited.append(next)
+                queue.append((next, path + [next]))
                 #print(queue)
 
     return None
@@ -63,10 +63,10 @@ def solve_dfs():
         if current[0] == GOAL or current[1] == GOAL:
             return path
 
-        for nxt in get_next_states(current):
-            if nxt not in visited:
-                visited.append(nxt)
-                stack.append((nxt, path + [nxt]))
+        for next in get_next_states(current):
+            if next not in visited:
+                visited.append(next)
+                stack.append((next, path + [next]))
                 #print(stack)
 
     return None
