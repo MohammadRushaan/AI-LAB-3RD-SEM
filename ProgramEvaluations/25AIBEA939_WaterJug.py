@@ -9,24 +9,19 @@ def get_next_states(state):
     # Fill Jug A
     if a < cap_a:
         moves.append((cap_a, b))
-
     # Fill Jug B
     if b < cap_b:
         moves.append((a, cap_b))
-
     # Empty Jug A
     if a > 0:
         moves.append((0, b))
-
     # Empty Jug B
     if b > 0:
         moves.append((a, 0))
-
     # Pour Jug A to Jug B
     if a > 0 and b < cap_b:
         pour = min(a, cap_b - b)
         moves.append((a - pour, b + pour))
-
     # Pour Jug B to Jug A
     if b > 0 and a < cap_a:
         pour = min(b, cap_a - a)
@@ -35,7 +30,7 @@ def get_next_states(state):
     return moves
 
 def solve_bfs():
-    # queue holds (current_state, list_of_steps_taken)
+    # queue holds (current_states, steps_taken)
     queue = [((0, 0), [(0, 0)])]
     visited = [(0, 0)]
 
