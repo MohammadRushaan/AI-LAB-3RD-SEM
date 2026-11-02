@@ -6,23 +6,22 @@ def get_next_states(state):
     a, b = state
     moves = []
 
-    # Fill Jug A
     if a < cap_a:
         moves.append((cap_a, b))
-    # Fill Jug B
+    
     if b < cap_b:
         moves.append((a, cap_b))
-    # Empty Jug A
+    
     if a > 0:
         moves.append((0, b))
-    # Empty Jug B
+    
     if b > 0:
         moves.append((a, 0))
-    # Pour Jug A to Jug B
+    
     if a > 0 and b < cap_b:
         pour = min(a, cap_b - b)
         moves.append((a - pour, b + pour))
-    # Pour Jug B to Jug A
+    
     if b > 0 and a < cap_a:
         pour = min(b, cap_a - a)
         moves.append((a + pour, b - pour))
@@ -44,7 +43,7 @@ def solve_bfs():
             if next not in visited:
                 visited.append(next)
                 queue.append((next, path + [next]))
-                #print(queue)
+                print(queue)
 
     return None
 
@@ -62,7 +61,7 @@ def solve_dfs():
             if next not in visited:
                 visited.append(next)
                 stack.append((next, path + [next]))
-                #print(stack)
+                print(stack)
 
     return None
 
