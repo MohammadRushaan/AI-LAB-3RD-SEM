@@ -1,7 +1,42 @@
-cap_a = 7
-cap_b = 4
-GOAL = 5
+"""
+The Two Necessary & Sufficient Conditions:
+A. target volume T can be measured if and only if
+    T is less than the maximum vessel capacity
 
+B. Divisibility by Greatest Common Divisor (GCD):
+    target must be an exact multiple of the greatest common divisor of A and B
+"""
+import sys
+
+cap_a=0
+cap_b=0
+GOAL=0
+
+def condition(a,b,t):
+    while b != 0:
+        a, b = b, a % b
+    abs(a)
+
+    if t>a and t>b:
+        state= True
+
+    if t%a==0:
+        state = False
+    else:
+        state = True
+
+    if state == True:
+        print("target precondition failed, no possible solution for given task")
+        sys.exit()
+
+def user_input():
+    global cap_a, cap_b, GOAL
+    cap_a = int(input("Enter capacity of Jug A: "))
+    cap_b = int(input("Enter capacity of Jug B: "))
+    GOAL = int(input("Enter target capacity: "))
+
+    condition(cap_a,cap_b,GOAL)
+    
 def get_next_states(state):
     a, b = state
     moves = []
@@ -65,14 +100,19 @@ def solve_dfs():
 
     return None
 
-bfs_path = solve_bfs()
-dfs_path = solve_dfs()
-
 def show_result(name, path):
     print(f"\n--- {name} ---")
     for i in range(len(path)):
         print("Step", i, ": Jug A =", path[i][0], "L, Jug B =", path[i][1], "L")
     print("Total Operations:", len(path) - 1)
 
-show_result("BFS Solution (Shortest)", bfs_path)
-show_result("DFS Solution", dfs_path)
+def main():
+    user_input()
+
+    bfs_path = solve_bfs()
+    dfs_path = solve_dfs()
+
+    show_result("BFS Solution (Shortest)", bfs_path)
+    show_result("DFS Solution", dfs_path)
+
+main()
