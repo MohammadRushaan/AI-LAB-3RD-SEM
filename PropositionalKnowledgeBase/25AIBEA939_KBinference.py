@@ -1,6 +1,4 @@
-# =====================================================================
-# 1. FORWARD CHAINING
-# =====================================================================
+
 def forward_chaining(facts, rules, query):
     """facts: set of known facts (e.g., {'Cloudy', 'Humid'})
 
@@ -50,10 +48,6 @@ def forward_chaining(facts, rules, query):
     print(f"Agenda empty. Query '{query}' could NOT be entailed.")
     return False
 
-
-# =====================================================================
-# 2. RESOLUTION REFUTATION
-# =====================================================================
 def negate(literal):
     """Returns ~L for positive literal L, and removes ~ for negative."""
     if literal.startswith("~"):
@@ -129,16 +123,6 @@ def resolution(cnf_clauses, query):
             return False
 
         clauses.update(new_clauses)
-
-
-# =====================================================================
-# 3. KNOWLEDGE BASE SETUP & TEST RUN
-# =====================================================================
-# Weather Domain:
-# Cloudy ^ Humid => Rainy
-# Rainy => WetGround
-# Rainy => TakeUmbrella
-# WetGround => Slippery
 
 # Forward Chaining format: (premises_list, conclusion)
 fc_facts = {"Cloudy", "Humid"}
