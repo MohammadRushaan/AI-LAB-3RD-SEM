@@ -1,90 +1,83 @@
-
 def forward_chaining(facts, rules, query):
-    """facts: set of known facts (e.g., {'Cloudy', 'Humid'})
-
-    rules: list of tuples (premises_list, conclusion)
-    query: target string to test
-    """
     print("\n--- FORWARD CHAINING TRACE ---")
 
-    # If already a known fact, we are done
+    # If the query is already in facts, return immediately
     if query in facts:
-        print(f"Query '{query}' is already a base fact!")
+        print("Goal '" + query + "' is already known!")
         return True
 
-    # Track how many premises remain unsatisfied for each rule
-    count = [len(premises) for premises, _ in rules]
+    # Build the count list
+    unmet_count = []
+    for rule in rules:
+        premises = rule[0]
+        unmet_count.append(len(premises))
 
-    # Queue of facts whose implications are yet to be checked
-    agenda = list(facts)
-    known = set(facts)
+    # Initialize agenda queue
+    agenda = []
+    for f in facts:
+        agenda.append(f)
 
-    print(f"Initial facts on agenda: {agenda}")
+    known = set()
+    for f in facts:
+        known.add(f)
+
+    print("Starting facts on queue: " + str(agenda))
 
     while len(agenda) > 0:
-        p = agenda.pop(0)
-        print(f"Processing symbol: {p}")
+        fact = agenda.pop(0)
+        print("Checking fact: " + str(fact))
 
         for i in range(len(rules)):
-            premises, conclusion = rules[i]
+            premises = rules[i][0]
+            conclusion = rules[i][1]
 
-            if p in premises:
-                count[i] -= 1
-                print(
-                    f"  Matched '{p}' in rule: {' ^ '.join(premises)} => {conclusion} (Remaining premises: {count[i]})"
-                )
+            if fact in premises:
+                unmet_count[i] = unmet_count[i] - 1
+                print("  Satisfied condition in rule: " + str(premises) + " => " + conclusion + 
+                      " (Remaining needed: " + str(unmet_count[i]) + ")")
 
-                # When all premises of this rule are satisfied
-                if count[i] == 0:
-                    print(f"  ==> Rule fired! Inferred: {conclusion}")
+                # If all premises of this rule are satisfied
+                if unmet_count[i] == 0:
+                    print("  ==> Rule fired! Deduced: " + conclusion)
                     if conclusion == query:
-                        print(f"  ==> Query '{query}' entailed!")
+                        print("  ==> Target '" + query + "' reached successfully!")
                         return True
 
                     if conclusion not in known:
                         known.add(conclusion)
                         agenda.append(conclusion)
 
-    print(f"Agenda empty. Query '{query}' could NOT be entailed.")
+    print("Queue empty. Could not prove '" + query + "'.")
     return False
 
-def negate(literal):
-    """Returns ~L for positive literal L, and removes ~ for negative."""
-    if literal.startswith("~"):
-        return literal[1:]
-    return "~" + literal
-
-
-def resolve_two_clauses(c1, c2):
-    """Resolves two clauses (frozensets of literals) on complementary pairs."""
-    resolvents = []
-    for lit in c1:
-        comp = negate(lit)
-        if comp in c2:
-            # Drop the complementary pair and combine the remaining literals
-            new_clause = (c1 - {lit}) | (c2 - {comp})
-            resolvents.append(frozenset(new_clause))
-    return resolvents
-
+def negate(lit):
+    #Complements the Literl
+    if lit.startswith("~"):
+        return lit[1:]
+    return "~" + lit
 
 def resolution(cnf_clauses, query):
-    """cnf_clauses: list of lists representing OR-clauses (e.g.
-
-    [['~A', 'B']])
-    query: target string to test
-    """
     print("\n--- RESOLUTION TRACE ---")
 
-    # Convert list of clauses to a set of frozensets
-    clauses = set(frozenset(c) for c in cnf_clauses)
+    # Convert list of clause lists into a set of frozensets
+    # Frozen sets are immutable sets and hence can be used to put a set inside a set
+    # In logical resolution, the knowledge base is a set of clauses, and each clause is a set of literals
+    clauses = set()
+    for c in cnf_clauses:
+        clause_frozenset = frozenset(c)
+        clauses.add(clause_frozenset)
 
-    # To test KB |= query, assume KB ^ ~query and check for contradiction
-    neg_query = frozenset([negate(query)])
-    clauses.add(neg_query)
+    # Negate the query and add it as a clause
+    negated_lit = negate(query)
+    neg_q = frozenset([negated_lit])
+    clauses.add(neg_q)
 
-    print(f"Goal: Prove '{query}'")
-    print(f"Negated query added: {set(neg_query)}")
-    print(f"Total starting clauses: {[set(c) for c in clauses]}")
+    printable_clauses = []
+    for c in clauses:
+        printable_clauses.append(set(c))
+
+    print("Goal: Prove '" + query + "' by refuting " + str(set(neg_q)))
+    print("Starting clauses: " + str(printable_clauses))
 
     step = 1
     while True:
@@ -92,81 +85,73 @@ def resolution(cnf_clauses, query):
         clause_list = list(clauses)
         n = len(clause_list)
 
-        # Check all pairs of clauses
+        # Compare every unique pair of clauses
         for i in range(n):
             for j in range(i + 1, n):
                 c1 = clause_list[i]
                 c2 = clause_list[j]
 
-                resolvents = resolve_two_clauses(c1, c2)
+                # Check if any literal in c1 has its opposite in c2
+                for lit in c1:
+                    opposite = negate(lit)
+                    if opposite in c2:
+                        # Drop complementary pair and combine remaining literals
+                        c1_remaining = c1 - {lit}
+                        c2_remaining = c2 - {opposite}
+                        resolvent = frozenset(c1_remaining | c2_remaining)
 
-                for res in resolvents:
-                    # Empty set means contradiction derived (L and ~L resolved)
-                    if len(res) == 0:
-                        print(
-                            f"Step {step}: Resolved {set(c1)} and {set(c2)} => EMPTY CLAUSE {{}} (Contradiction!)"
-                        )
-                        print(f"==> Query '{query}' is entailed (True).")
-                        return True
+                        # Empty clause derived: Contradiction found
+                        if len(resolvent) == 0:
+                            print("Step " + str(step) + ": Resolved " + str(set(c1)) + 
+                                  " and " + str(set(c2)) + " => {} (Empty Clause / Contradiction!)")
+                            print("==> Contradiction found! Therefore '" + query + "' is TRUE.")
+                            return True
 
-                    if res not in clauses and res not in new_clauses:
-                        print(
-                            f"Step {step}: Resolved {set(c1)} and {set(c2)} => {set(res)}"
-                        )
-                        new_clauses.add(res)
-                        step += 1
+                        if resolvent not in clauses and resolvent not in new_clauses:
+                            print("Step " + str(step) + ": Resolved " + str(set(c1)) + 
+                                  " and " + str(set(c2)) + " => " + str(set(resolvent)))
+                            new_clauses.add(resolvent)
+                            step = step + 1
 
-        # If no new clauses were derived, refutation failed
+        # If no new clauses were formed, entailment fails
         if new_clauses.issubset(clauses):
-            print("No new resolvents can be produced. No contradiction.")
-            print(f"==> Query '{query}' is NOT entailed (False).")
+            print("No new clauses can be derived. No contradiction found.")
+            print("==> Query '" + query + "' is FALSE.")
             return False
 
-        clauses.update(new_clauses)
+        # Add newly derived clauses to the main clause
+        for c in new_clauses:
+            clauses.add(c)
 
-# Forward Chaining format: (premises_list, conclusion)
+# Forward Chaining setup
 fc_facts = {"Cloudy", "Humid"}
 fc_rules = [
     (["Cloudy", "Humid"], "Rainy"),
     (["Rainy"], "WetGround"),
-    (["Rainy"], "TakeUmbrella"),
-    (["WetGround"], "Slippery"),
+    (["Rainy"], "TakeUmbrella")
 ]
 
-# Resolution CNF format: list of OR clauses
-# (A ^ B => C is logically equivalent to ~A v ~B v C)
+# 2. Resolution setup :
 cnf_kb = [
     ["Cloudy"],
     ["Humid"],
     ["~Cloudy", "~Humid", "Rainy"],
     ["~Rainy", "WetGround"],
-    ["~Rainy", "TakeUmbrella"],
-    ["~WetGround", "Slippery"],
+    ["~Rainy", "TakeUmbrella"]
 ]
 
-# Display Knowledge Base
-print("=" * 60)
-print("KNOWLEDGE BASE FACTS AND RULES:")
-print("Base Facts:", fc_facts)
-print("Rules (Horn Form):")
-for prems, concl in fc_rules:
-    print(f"  {' ^ '.join(prems)} => {concl}")
-print("=" * 60)
-
-# Test 1: Query that should be True
 query1 = "TakeUmbrella"
-print(f"\n================ TESTING QUERY 1: {query1} ================")
-res_fc = forward_chaining(fc_facts, fc_rules, query1)
-res_reso = resolution(cnf_kb, query1)
-print(f"\nResult for '{query1}':")
-print(f"  Forward Chaining: {res_fc}")
-print(f"  Resolution:       {res_reso}")
+print("==================== QUERY 1: " + query1 + " ====================")
+res_fc1 = forward_chaining(fc_facts, fc_rules, query1)
+res_res1 = resolution(cnf_kb, query1)
+print("\nFinal Results for '" + query1 + "':")
+print("  Forward Chaining: " + str(res_fc1))
+print("  Resolution:       " + str(res_res1))
 
-# Test 2: Query that should be False
 query2 = "Snowy"
-print(f"\n================ TESTING QUERY 2: {query2} ================")
+print("\n==================== QUERY 2: " + query2 + " ====================")
 res_fc2 = forward_chaining(fc_facts, fc_rules, query2)
-res_reso2 = resolution(cnf_kb, query2)
-print(f"\nResult for '{query2}':")
-print(f"  Forward Chaining: {res_fc2}")
-print(f"  Resolution:       {res_reso2}")
+res_res2 = resolution(cnf_kb, query2)
+print("\nFinal Results for '" + query2 + "':")
+print("  Forward Chaining: " + str(res_fc2))
+print("  Resolution:       " + str(res_res2))
